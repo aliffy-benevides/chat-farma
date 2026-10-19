@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-import rag.agent as agent
+import src.rag.agent as agent
 
 
 @dataclass

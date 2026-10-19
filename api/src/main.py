@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from core.settings import get_settings
-from rag.agent import answer_with_context, get_llm
-from rag.rag import build_faiss_from_dir
-from schemas import ChatRequest, ChatResponse, SourceSnippet
+from src.core.settings import get_settings
+from src.rag.agent import answer_with_context, get_llm
+from src.rag.rag import build_faiss_from_dir
+from src.schemas import ChatRequest, ChatResponse, SourceSnippet
 
 
 def create_app() -> FastAPI:

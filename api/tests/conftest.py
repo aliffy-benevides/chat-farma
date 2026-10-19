@@ -10,7 +10,7 @@ def client(monkeypatch: pytest.MonkeyPatch):
     """
 
     # Import inside fixture so monkeypatch is applied before app creation
-    import main
+    import src.main
 
     class DummyDoc:
         def __init__(self, content: str, source: str = "src") -> None:
@@ -37,7 +37,7 @@ def client(monkeypatch: pytest.MonkeyPatch):
 
     # Default stub: 1 doc so /chat has context by default
     monkeypatch.setattr(
-        main,
+        src.main,
         "build_faiss_from_dir",
         lambda _: DummyRag([DummyDoc("conteudo", source="doc1")]),
     )
@@ -46,8 +46,8 @@ def client(monkeypatch: pytest.MonkeyPatch):
         def invoke(self, messages):
             return type("Resp", (), {"content": "resposta"})()
 
-    monkeypatch.setattr(main, "get_llm", lambda model: DummyLLM())
-    monkeypatch.setattr(main, "answer_with_context", lambda llm, user_message, hits: "resposta")
+    monkeypatch.setattr(src.main, "get_llm", lambda model: DummyLLM())
+    monkeypatch.setattr(src.main, "answer_with_context", lambda llm, user_message, hits: "resposta")
 
-    app = main.create_app()
+    app = src.main.create_app()
     return TestClient(app)

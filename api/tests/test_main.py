@@ -32,7 +32,7 @@ def test_chat_success_returns_answer_and_sources(client: TestClient) -> None:
 
 def test_chat_refused_when_no_docs(monkeypatch: pytest.MonkeyPatch) -> None:
     # Build a client where retriever returns no docs
-    import main
+    import src.main
 
     class DummyRetriever:
         def invoke(self, message: str):
@@ -45,13 +45,13 @@ def test_chat_refused_when_no_docs(monkeypatch: pytest.MonkeyPatch) -> None:
     class DummyRag:
         vectorstore = DummyVectorStore()
 
-    monkeypatch.setattr(main, "build_faiss_from_dir", lambda _: DummyRag())
-    monkeypatch.setattr(main, "get_llm", lambda model: object())
+    monkeypatch.setattr(src.main, "build_faiss_from_dir", lambda _: DummyRag())
+    monkeypatch.setattr(src.main, "get_llm", lambda model: object())
 
     # Even with no docs, answer_with_context will be called; keep it deterministic
-    monkeypatch.setattr(main, "answer_with_context", lambda llm, user_message, hits: "sem contexto")
+    monkeypatch.setattr(src.main, "answer_with_context", lambda llm, user_message, hits: "sem contexto")
 
-    c = TestClient(main.create_app())
+    c = TestClient(src.main.create_app())
 
     resp = c.post("/chat", json={"message": "x"})
     assert resp.status_code == 200

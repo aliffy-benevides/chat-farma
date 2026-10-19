@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-import rag.rag as rag_module
+import src.rag.rag as rag_module
 
 
 @dataclass

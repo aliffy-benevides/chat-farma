@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from schemas import ChatRequest, ChatResponse, SourceSnippet
+from src.schemas import ChatRequest, ChatResponse, SourceSnippet
 
 
 def test_chat_request_accepts_valid_message() -> None:

@@ -7,7 +7,7 @@ import pytest
 
 def _reload_settings_module():
     """Reload settings module to avoid lru_cache cross-test interference."""
-    import core.settings as settings_module
+    import src.core.settings as settings_module
 
     settings_module.get_settings.cache_clear()
     return importlib.reload(settings_module)
