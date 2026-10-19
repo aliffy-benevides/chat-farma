@@ -1,0 +1,92 @@
+%% Chat Farma (MVP) — Arquitetura de Componentes e Fluxo de Dados
+%% Stack: Frontend Streamlit | Backend FastAPI + LangChain (RAG)
+%% Estilo: simples e legível
+
+flowchart LR
+  %% ===============
+  %% UI
+  %% ===============
+  subgraph UI[Frontend — Streamlit]
+    U[Profissional de saúde]
+    ST[Streamlit Chat UI
+- mensagem
+- histórico da sessão
+- exibição de fontes/snippets
+- aviso LGPD]
+    U -->|pergunta| ST
+  end
+
+  %% ===============
+  %% API / Orquestração
+  %% ===============
+  subgraph API[Backend — FastAPI]
+    CHAT[/POST \/chat
+contrato: answer + citations + snippets + missing_information/]
+    ORCH[Orquestrador RAG LangChain
+- intenção: consulta vs validação
+- guardrails/recusa
+- montagem do prompt]
+    SCHEMA[Validador / Pós-processamento
+- enforce schema auditável
+- exigir citações p/ resposta clínica]
+
+    CHAT --> ORCH --> SCHEMA
+  end
+
+  %% ===============
+  %% Retrieval / Index
+  %% ===============
+  subgraph RET[Camada de Retrieval / Índice]
+    IDX[(Vector Store / Índice Semântico
++ versionamento do índice)]
+    RETR[Retriever
+- top_k
+- limiar de relevância
+- retorna trechos + metadados]
+    IDX <--> RETR
+  end
+
+  %% ===============
+  %% Fontes e ingestão
+  %% ===============
+  subgraph DATA[Acervo de Referência curado + Ingestão]
+    SRC[Fontes curadas - HTML/TXT/PDF
+- título
+- origem URL/caminho
+- data de captura]
+    ING[Pipeline de ingestão
+- extração de texto
+- chunking + overlap
+- metadados]
+    SRC --> ING --> IDX
+  end
+
+  %% ===============
+  %% LLM
+  %% ===============
+  LLM[(LLM Provider
+- respostas restringidas ao contexto)]
+
+  %% ===============
+  %% Fluxo principal
+  %% ===============
+  ST -->|HTTP JSON| CHAT
+
+  ORCH -->|consulta| RETR
+  RETR -->|top-k trechos + metadados| ORCH
+
+  ORCH -->|prompt + contexto recuperado| LLM
+  LLM -->|rascunho de resposta com referências| ORCH
+
+  SCHEMA -->|resposta final
+answer + citations + snippets + limitations + missing_information| CHAT
+  CHAT -->|resposta| ST
+
+  %% ===============
+  %% Fluxos alternativos (simplificados)
+  %% ===============
+  ORCH -.->|sem evidência retrieval vazio/baixo score
+responder recusa + sugestão de busca| CHAT
+  ORCH -.->|faltam dados do caso
+solicitar missing_information| CHAT
+
