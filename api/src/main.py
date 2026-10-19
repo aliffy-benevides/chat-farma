@@ -17,12 +17,6 @@ def create_app() -> FastAPI:
         debug=settings.DEBUG,
     )
 
-    # Build a simple in-memory FAISS index at startup (MVP simplicity)
-    rag = build_faiss_from_dir(settings.RAG_REFERENCE_DIR)
-    retriever = rag.vectorstore.as_retriever(search_kwargs={"k": settings.RAG_TOP_K})
-
-    llm = get_llm(model=settings.OLLAMA_CHAT_MODEL)
-
     @app.get("/health", tags=["health"])
     def health_check() -> dict:
         return {
@@ -32,24 +26,34 @@ def create_app() -> FastAPI:
             "environment": settings.ENVIRONMENT,
         }
 
+    # Build a simple in-memory FAISS index at startup (MVP simplicity)
+    rag = build_faiss_from_dir(settings.RAG_REFERENCE_DIR)
+    retriever = rag.vectorstore.as_retriever(search_kwargs={"k": settings.RAG_TOP_K})
+
+    llm = get_llm(model=settings.OLLAMA_CHAT_MODEL)
+
     @app.post("/chat", response_model=ChatResponse, tags=["chat"])
     def chat(payload: ChatRequest) -> ChatResponse:
         docs = retriever.invoke(payload.message)
 
-        hits = []
+        # Verifique se há fontes válidas antes de iterar.
+        if not docs:
+            answer = llm.invoke(
+                f'Não foi possível encontrar "{payload.message}" nas referências do MVP. '
+                "Tente reformular a pergunta com termos mais específicos (ex.: nome do fármaco, indicação, dose, via, função renal) "
+                "ou informe mais dados clínicos relevantes."
+            ).content
+            return ChatResponse(answer=answer, sources=[], refused=True)
+
         sources: list[SourceSnippet] = []
         for d in docs:
             source_id = d.metadata.get("source", "unknown")
             snippet = (d.page_content or "")[:600]
-            hits.append({"source": source_id, "content": snippet})
             sources.append(SourceSnippet(source_id=source_id, snippet=snippet))
 
-        answer = answer_with_context(llm=llm, user_message=payload.message, hits=hits)
+        answer = answer_with_context(llm=llm, user_message=payload.message, sources=sources)
 
-        # Simple refusal heuristic: agent instructed to refuse when no context.
-        refused = len(docs) == 0
-
-        return ChatResponse(answer=answer, sources=sources, refused=refused)
+        return ChatResponse(answer=answer, sources=sources, refused=False)
 
     return app
 

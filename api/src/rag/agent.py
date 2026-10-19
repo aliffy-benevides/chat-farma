@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from src.schemas import SourceSnippet
+
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -28,17 +30,17 @@ def get_llm(model: str, temperature: float = 0.2) -> ChatOllama:
     )
 
 
-def format_context_snippets(hits: list[dict[str, Any]]) -> str:
+def format_context_snippets(sources: list[SourceSnippet]) -> str:
     parts: list[str] = []
-    for i, h in enumerate(hits, start=1):
-        src = h.get("source", "unknown")
-        content = h.get("content", "")
+    for i, s in enumerate(sources, start=1):
+        src = s.source_id or "unknown"
+        content = s.snippet or ""
         parts.append(f"[Fonte {i}] {src}\n{content}")
     return "\n\n".join(parts)
 
 
-def answer_with_context(llm: ChatOllama, user_message: str, hits: list[dict[str, Any]]) -> str:
-    context = format_context_snippets(hits)
+def answer_with_context(llm: ChatOllama, user_message: str, sources: list[SourceSnippet]) -> str:
+    context = format_context_snippets(sources)
 
     prompt = f"""Pergunta do usuário:
 {user_message}
