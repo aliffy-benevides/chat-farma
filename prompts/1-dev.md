@@ -33,3 +33,7 @@ Objetivo: Com base no escopo e nos schemas da api, crie o frontend do chatbot.
 Estilo: Crie o projeto frontend usando Streamlit, projeto simples com a tela do projeto e a interação com a api.
 
 Resposta: Projeto estruturado em 'web/'.
+
+# 4. Docker files (mesmo contexto de 3.)
+
+Crie o arquivo Dockerfile dentro de cada projeto ('api' e 'web'), e atualize o arquivo compose.yml com os dois serviços. Use python3.14.
