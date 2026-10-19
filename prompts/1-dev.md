@@ -1,4 +1,4 @@
-# Prompt 1 - API structure
+# 1. - API structure
 
 Contexto: @escopo.md
 
@@ -6,7 +6,7 @@ Objetivo: Me auxilie no desenvolvimento do backend da aplicação, quero que com
 
 Resposta: Código estruturado da api do projeto.
 
-# Prompt 1 - API LLM
+# 2. - API LLM
 
 Contexto: Habilitaremos o agente LLM na api 
 
@@ -24,3 +24,12 @@ Objetivos:
 
 - O LLM será rodado local usando o ollama
 
+# 3. Streamlit structure
+
+Contexto: @escopo.md e @schemas.py 
+
+Objetivo: Com base no escopo e nos schemas da api, crie o frontend do chatbot.
+
+Estilo: Crie o projeto frontend usando Streamlit, projeto simples com a tela do projeto e a interação com a api.
+
+Resposta: Projeto estruturado em 'web/'.
