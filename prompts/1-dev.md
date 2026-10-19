@@ -1,4 +1,4 @@
-# 1. - API structure
+# 1. API structure
 
 Contexto: @escopo.md
 
@@ -6,7 +6,7 @@ Objetivo: Me auxilie no desenvolvimento do backend da aplicação, quero que com
 
 Resposta: Código estruturado da api do projeto.
 
-# 2. - API LLM
+# 2. API LLM
 
 Contexto: Habilitaremos o agente LLM na api 
 

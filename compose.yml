@@ -6,11 +6,6 @@ services:
       - "11434:11434"
     volumes:
       - ollama:/root/.ollama
-    # entrypoint: ["/bin/sh", "-lc"]
-    # command: |
-    #   ollama pull qwen3:1.7b
-    #   ollama pull nomic-embed-text
-    #   wait -n
 
   api:
     build: ./api
