@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="local")
     DEBUG: bool = Field(default=False)
 
-    # LLM / RAG
-    OPENAI_API_KEY: str | None = Field(default=None)
-    OPENAI_CHAT_MODEL: str = Field(default="gpt-4o-mini")
-    OPENAI_EMBEDDING_MODEL: str = Field(default="text-embedding-3-small")
+    # LLM / RAG (Ollama local)
+    OLLAMA_BASE_URL: str = Field(default="http://localhost:11434")
+    OLLAMA_CHAT_MODEL: str = Field(default="llama3.1")
+    OLLAMA_EMBEDDING_MODEL: str = Field(default="nomic-embed-text")
 
     RAG_REFERENCE_DIR: str = Field(default="data/references")
     RAG_TOP_K: int = Field(default=4)
