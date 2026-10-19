@@ -58,11 +58,15 @@ def test_build_faiss_from_dir_builds_index_and_normalizes_metadata(
                 Chunk("c3", {"source": "s3"}),
             ]
 
+    # OllamaEmbeddings is mocked globally in tests/conftest.py,
+    # but for this test we want to assert which kwargs were used.
     created_embeddings: dict[str, Any] = {}
 
     class FakeEmbeddings:
         def __init__(self, **kwargs: Any) -> None:
             created_embeddings.update(kwargs)
+
+    monkeypatch.setattr(rag_module, "OllamaEmbeddings", FakeEmbeddings)
 
     captured: dict[str, Any] = {}
 
@@ -78,7 +82,7 @@ def test_build_faiss_from_dir_builds_index_and_normalizes_metadata(
 
     monkeypatch.setattr(rag_module, "DirectoryLoader", FakeDirectoryLoader)
     monkeypatch.setattr(rag_module, "RecursiveCharacterTextSplitter", FakeSplitter)
-    monkeypatch.setattr(rag_module, "OllamaEmbeddings", FakeEmbeddings)
+    # OllamaEmbeddings is mocked globally in tests/conftest.py
     monkeypatch.setattr(rag_module, "FAISS", FakeFAISS)
 
     # Act
@@ -132,7 +136,7 @@ def test_build_faiss_from_dir_passes_expected_loader_config(
 
     monkeypatch.setattr(rag_module, "DirectoryLoader", FakeDirectoryLoader)
     monkeypatch.setattr(rag_module, "RecursiveCharacterTextSplitter", FakeSplitter)
-    monkeypatch.setattr(rag_module, "OllamaEmbeddings", FakeEmbeddings)
+    # OllamaEmbeddings is mocked globally in tests/conftest.py
     monkeypatch.setattr(rag_module, "FAISS", FakeFAISS)
 
     _ = rag_module.build_faiss_from_dir(str(ref_dir))

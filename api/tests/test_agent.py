@@ -23,13 +23,13 @@ class DummyLLM:
 
 
 def test_format_context_snippets_formats_and_defaults_unknown() -> None:
-    hits = [
-        {"source": "doc1.txt", "content": "trecho 1"},
-        {"content": "trecho 2 sem source"},
-        {},
+    sources = [
+        agent.SourceSnippet(source_id="doc1.txt", snippet="trecho 1"),
+        agent.SourceSnippet(source_id="unknown", snippet="trecho 2 sem source"),
+        agent.SourceSnippet(source_id="unknown", snippet=""),
     ]
 
-    out = agent.format_context_snippets(hits)
+    out = agent.format_context_snippets(sources)
 
     assert "[Fonte 1] doc1.txt\ntrecho 1" in out
     assert "[Fonte 2] unknown\ntrecho 2 sem source" in out
@@ -40,8 +40,8 @@ def test_format_context_snippets_formats_and_defaults_unknown() -> None:
 def test_answer_with_context_calls_llm_and_returns_content() -> None:
     llm = DummyLLM()
 
-    hits = [{"source": "doc1", "content": "conteudo"}]
-    out = agent.answer_with_context(llm=llm, user_message="pergunta?", hits=hits)
+    sources = [agent.SourceSnippet(source_id="doc1", snippet="conteudo")]
+    out = agent.answer_with_context(llm=llm, user_message="pergunta?", sources=sources)
 
     assert out == "ok"
     assert len(llm.invocations) == 1

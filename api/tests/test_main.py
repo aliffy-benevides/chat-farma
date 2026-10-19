@@ -46,10 +46,13 @@ def test_chat_refused_when_no_docs(monkeypatch: pytest.MonkeyPatch) -> None:
         vectorstore = DummyVectorStore()
 
     monkeypatch.setattr(src.main, "build_faiss_from_dir", lambda _: DummyRag())
-    monkeypatch.setattr(src.main, "get_llm", lambda model: object())
 
-    # Even with no docs, answer_with_context will be called; keep it deterministic
-    monkeypatch.setattr(src.main, "answer_with_context", lambda llm, user_message, hits: "sem contexto")
+    # Mock LLM so /chat refusal path never hits a real Ollama instance.
+    class DummyLLM:
+        def invoke(self, messages):
+            return type("Resp", (), {"content": "nao encontrado"})()
+
+    monkeypatch.setattr(src.main, "get_llm", lambda model: DummyLLM())
 
     c = TestClient(src.main.create_app())
 
@@ -57,7 +60,7 @@ def test_chat_refused_when_no_docs(monkeypatch: pytest.MonkeyPatch) -> None:
     assert resp.status_code == 200
 
     data = resp.json()
-    assert data["answer"] == "sem contexto"
+    assert data["answer"] == "nao encontrado"
     assert data["sources"] == []
     assert data["refused"] is True
 
